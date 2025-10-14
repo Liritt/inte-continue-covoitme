@@ -1,9 +1,26 @@
 pipeline {
     agent any
+    tools {
+        maven 'Maven 3.8.6'
+    }
+
     stages {
-        stage('Example') {
+        stage('Checkout') {
             steps {
-                echo 'Hello World'
+                git url: 'https://github.com/votre-utilisateur/votre-projet.git', branch: 'main'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn --version'
+                sh 'mvn clean install' 
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
     }
