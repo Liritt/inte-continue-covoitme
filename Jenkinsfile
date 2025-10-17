@@ -23,5 +23,15 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.war', fingerprint: true
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def imageName = "covoitme-app:${env.BUILD_NUMBER}"
+                    echo "Building Docker image: ${imageName}"
+                    docker.build(imageName, '.')
+                }
+            }
+        }
     }
 }
