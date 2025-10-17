@@ -43,7 +43,7 @@ L'application sera accessible en local via l'adresse [http://localhost:8080](htt
 Pour construire l'image Docker à la fois pour les architectures `linux/amd64` et `linux/arm64`, utilisez dans un premier temps la commande suivante afin de créer un builder multi-architecture :
 
 ```bash
-docker buildx create --name multi-arch --platform "linux/arm64,linux/amd64,linux/arm/v7" --driver "docker-container"
+cd docker && docker buildx create --name multi-arch --platform "linux/arm64,linux/amd64,linux/arm/v7" --driver "docker-container"
 ```
 
 Ensuite, il suffit de construire l'image Docker en utilisant le builder créé précédemment. Assurez-vous d'être dans le répertoire contenant le fichier `Dockerfile` :
@@ -59,7 +59,7 @@ docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile . -t ollopi
 Afin de lancer le projet pour le développement local, nous avons un docker-compose contenant une base de données PostgreSQL, et nous avons notre serveur web Tomcat d'installé sur notre machine. Pour lancer l'application, il faut dans un premier temps lancer la base de données :
 
 ```bash
-docker compose -f compose-dev.yml up -d
+cd docker && docker compose -f compose-dev.yml up -d
 ```
 
 Puis ensuite à chaque modification nous recompilons l'app et nous la déployons sur le serveur Tomcat, cela à l'aide d'un script que nous avons en local et contenant la commande suivante :
