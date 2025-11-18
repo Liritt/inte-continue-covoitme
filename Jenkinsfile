@@ -4,6 +4,11 @@ pipeline {
         maven 'Maven 3.8.6'
     }
 
+    environment {
+        REGISTRY_URL = 'https://ghcr.io'
+        REGISTRY_CREDENTIAL_ID = 'github-ghcr-credentials'
+        IMAGE_NAME = "ghcr.io/liritt/inte-continue-covoitme"
+
     stages {
         stage('Checkout') {
             steps {
@@ -27,9 +32,14 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def imageName = "covoitme-app:${env.BUILD_NUMBER}"
-                    echo "Building Docker image: ${imageName}"
-                    docker.build(imageName, '.')
+                    def dockerImage = "${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    echo "Construction de l'image : ${dockerImage}"
+
+                    docker.withRegistry(env.REGISTRY_URL, env.REGISTRY_CREDENTIAL_ID) {
+                        def img = docker.build(dockerImage, '.')
+                        img.push()
+                        img.push('latest')
+                    }
                 }
             }
         }
