@@ -8,6 +8,7 @@ pipeline {
         REGISTRY_URL = 'https://ghcr.io'
         REGISTRY_CREDENTIAL_ID = 'github-ghcr-credentials'
         IMAGE_NAME = "ghcr.io/liritt/inte-continue-covoitme"
+    }
 
     stages {
         stage('Checkout') {
