@@ -11,6 +11,7 @@ pipeline {
         PREPROD_SSH_ID = 'preprod-ssh-key'
         PREPROD_USER_HOST = 'urca@10.11.19.50'
         CONTAINER_NAME = 'covoitme-preprod'
+        MAVEN_OPTS = "-Xmx1024m"
     }
 
     stages {
