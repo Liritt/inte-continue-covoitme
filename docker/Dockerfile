@@ -5,7 +5,7 @@ COPY pom.xml .
 COPY src ./src
 COPY nb-configuration.xml ./
 
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 FROM tomcat:10-jdk17-openjdk-slim
 

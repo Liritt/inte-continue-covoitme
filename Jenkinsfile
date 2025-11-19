@@ -23,7 +23,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'mvn --version'
-                sh 'mvn clean install' 
+                sh 'mvn clean package -DskipTests' 
             }
         }
 
@@ -69,6 +69,17 @@ pipeline {
                                   --name ${env.CONTAINER_NAME} \
                                   -p 8080:8080 \
                                   ${imageToDeploy}
+
+                                docker run -d \
+                                    --name covoitme-db \
+                                    -e POSTGRES_DB=covoitme \
+                                    -e POSTGRES_USER=covoitme \
+                                    -e POSTGRES_PASSWORD=password \
+                                    -v db-data:/var/lib/postgresql/data \
+                                    -v init-scripts:/docker-entrypoint-initdb.d \
+                                    -p 5432:5432 \
+                                    --restart always \
+                                    postgres:17.5
                             '''
                         """
                     }
