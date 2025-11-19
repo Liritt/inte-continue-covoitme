@@ -63,7 +63,7 @@ pipeline {
                                 docker stop ${env.CONTAINER_NAME} || true
                                 docker rm ${env.CONTAINER_NAME} || true
                                 echo "Démarrage du nouveau conteneur"
-                                docker run -d --name ${env.CONTAINER_NAME} -p 8080:8080 ${imageToDeploy}
+                                docker run -d --name ${env.CONTAINER_NAME} -p 8080:8080 -e DB_HOST=covoitme-db -e DB_PORT=5432 -e DB_USER=covoitme -e DB_PASSWORD=password ${imageToDeploy}
                                 docker run -d --name covoitme-db -e POSTGRES_DB=covoitme -e POSTGRES_USER=covoitme -e POSTGRES_PASSWORD=password -v db-data:/var/lib/postgresql/data -v init-scripts:/docker-entrypoint-initdb.d -p 5432:5432 --restart always postgres:17.5
                             '
                         """
