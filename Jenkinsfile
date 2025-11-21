@@ -54,20 +54,16 @@ pipeline {
                 sshagent(credentials: [env.PREPROD_SSH_ID]) {
                     script {
                         def imageToDeploy = "${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
+
+                        sh "scp -o StrictHostKeyChecking=no compose.yml ${env.PREPROD_USER_HOST}:~/compose.yml"
+                        sh "ssh -o StrictHostKeyChecking=no ${env.PREPROD_USER_HOST} 'mkdir -p ~/src/main/webapp/WEB-INF/sql'"
+                        sh "scp -o StrictHostKeyChecking=no src/main/webapp/WEB-INF/sql/init.sql ${env.PREPROD_USER_HOST}:~/src/main/webapp/WEB-INF/sql/init.sql"
+
                         def deployCmd = """
                             ssh -o StrictHostKeyChecking=no ${env.PREPROD_USER_HOST} '
-                                echo "--- Déploiement sur Preprod ---"
-                                echo "Téléchargement de la nouvelle image"
-                                docker pull ${imageToDeploy}
-                                echo "Arrêt de l ancien conteneur"
-                                docker stop ${env.CONTAINER_NAME} || true
-                                docker rm ${env.CONTAINER_NAME} || true
-                                echo "Démarrage du nouveau conteneur"
-                                docker network create covoitme-net || true
-                                docker rm -f covoitme-db || true
-                                docker run -d --name covoitme-db -e POSTGRES_DB=covoitme --network covoitme-net -e POSTGRES_USER=covoitme -e POSTGRES_PASSWORD=password -v db-data:/var/lib/postgresql/data -v init-scripts:/docker-entrypoint-initdb.d -p 5432:5432 --restart always postgres:17.5
-                                docker rm -f ${env.CONTAINER_NAME} || true
-                                docker run -d --name ${env.CONTAINER_NAME} --network covoitme-net -p 8080:8080 -e DB_HOST=covoitme-db -e DB_PORT=5432 -e DB_USER=covoitme -e DB_PASSWORD=password ${imageToDeploy}
+                                docker compose -f ~/compose.yml pull
+                                docker compose -f ~/compose.yml down
+                                docker compose -f ~/compose.yml up -d
                             '
                         """
                         sh deployCmd

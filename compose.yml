@@ -1,6 +1,6 @@
 services:
   app:
-    image: ollopic/covoitme:latest
+    image: ghcr.io/liritt/inte-continue-covoitme:latest
     container_name: covoitme-app
     ports:
       - "8080:8080"
@@ -12,8 +12,6 @@ services:
       - DB_PASSWORD=password
     depends_on:
       - db
-    volumes:
-      - init-scripts:/docker-entrypoint-initdb.d
     restart: always
 
   db:
@@ -25,11 +23,10 @@ services:
       - POSTGRES_PASSWORD=password
     volumes:
       - db-data:/var/lib/postgresql/data
-      - init-scripts:/docker-entrypoint-initdb.d
+      - ./src/main/webapp/WEB-INF/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     restart: always
 
 volumes:
   db-data:
-  init-scripts:
