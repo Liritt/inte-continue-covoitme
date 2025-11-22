@@ -18,7 +18,12 @@ public class BaseTest {
   @BeforeAll
   static void launchBrowser() {
     playwright = Playwright.create();
-    browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(500));
+
+    boolean isCI = System.getenv("CI") != null;
+
+    browser = playwright
+      .chromium()
+      .launch(new BrowserType.LaunchOptions().setHeadless(isCI).setSlowMo(isCI ? 0 : 500));
   }
 
   @AfterAll
