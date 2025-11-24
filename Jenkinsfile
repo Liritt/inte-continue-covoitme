@@ -12,6 +12,7 @@ pipeline {
         PREPROD_USER_HOST = 'urca@10.11.19.50'
         CONTAINER_NAME = 'covoitme-preprod'
         MAVEN_OPTS = "-Xmx1024m"
+        CI = "true"
     }
 
     stages {
@@ -69,6 +70,13 @@ pipeline {
                         sh deployCmd
                     }
                 }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install-deps"'
+                sh 'mvn test'
             }
         }
     }
