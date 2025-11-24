@@ -91,7 +91,7 @@ pipeline {
         // Si le tests réussissent sur la pre-prod, alors on peut déployer l'app sur la prod
         stage('Deploy to Prod') {
             steps {
-                sshagent(credentials: [env.PROD_SSH_ID]) {
+                sshagent(credentials: [env.PREPROD_SSH_ID]) {
                     script {
                         def imageToDeploy = "${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
 
