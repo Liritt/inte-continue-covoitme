@@ -44,9 +44,13 @@ public class BaseTest {
   }
 
   protected void insertTestUser(String email, String password, String nom, String prenom) {
-    String url = "jdbc:postgresql://localhost:5432/covoitme";
-    String user = "covoitme";
-    String dbPassword = "password";
+    String host = System.getenv().getOrDefault("DB_HOST", "localhost");
+    String port = System.getenv().getOrDefault("DB_PORT", "5432");
+    String dbName = System.getenv().getOrDefault("DB_NAME", "covoitme");
+    String user = System.getenv().getOrDefault("DB_USER", "covoitme");
+    String dbPassword = System.getenv().getOrDefault("DB_PASSWORD", "password");
+
+    String url = "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
 
     try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
       // Vérifier si l'utilisateur existe déjà
