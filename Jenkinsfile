@@ -75,8 +75,16 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh 'mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install-deps"'
-                sh 'mvn test'
+                sshagent(credentials: [env.PREPROD_SSH_ID]) {
+                    script {
+                        def testCmd = """
+                            ssh -o StrictHostKeyChecking=no ${env.PREPROD_USER_HOST} '
+                                docker exec ${env.CONTAINER_NAME} mvn test
+                            '
+                        """
+                        sh testCmd
+                    }
+                }
             }
         }
     }

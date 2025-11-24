@@ -1,11 +1,12 @@
-FROM maven:3.8.7-openjdk-18 AS build
+FROM maven:3.8.7-openjdk-18-slim AS build
 
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 COPY nb-configuration.xml ./
 
-RUN mvn clean package -DskipTests \
+RUN export MAVEN_OPTS="-Xmx1024m" \
+    && mvn clean package -DskipTests \
     && mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install-deps" \
     && mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install"
 
