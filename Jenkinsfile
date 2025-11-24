@@ -10,7 +10,6 @@ pipeline {
         IMAGE_NAME = "ghcr.io/liritt/inte-continue-covoitme"
         PREPROD_SSH_ID = 'preprod-ssh-key'
         PREPROD_USER_HOST = 'urca@10.11.19.50'
-        CONTAINER_NAME = 'covoitme-preprod'
         MAVEN_OPTS = "-Xmx1024m"
         CI = "true"
     }
@@ -79,7 +78,7 @@ pipeline {
                     script {
                         def testCmd = """
                             ssh -o StrictHostKeyChecking=no ${env.PREPROD_USER_HOST} '
-                                docker exec ${env.CONTAINER_NAME} mvn test
+                                docker exec covoitme-app mvn test
                             '
                         """
                         sh testCmd
