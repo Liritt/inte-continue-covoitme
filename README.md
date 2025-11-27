@@ -23,6 +23,7 @@ Lemont Gaétan
 - **Serveur d'application** : Apache Tomcat
 - **Conteneurisation** : Docker
 - **Tests E2E** : Playwright, JUnit 5
+- **Tests de charge** : Locust
 
 ## Prérequis
 
@@ -110,3 +111,27 @@ mvn test -Dtest=AuthenticationTest#shouldLoginSuccessfully
 ```bash
 mvn clean test -X -e
 ```
+
+## Tests de charge
+
+L'application utilise Locust pour les tests de montée en charge, intégrés dans la pipeline Jenkins.
+
+### Lancer les tests localement
+
+```bash
+cd load-tests
+make test
+```
+
+### Intégration CI/CD
+
+Les tests de charge sont automatiquement exécutés dans la pipeline Jenkins :
+
+**Pipeline :**
+1. Build & Tests unitaires
+2. Déploiement Preprod
+3. Tests E2E (Playwright)
+4. **Tests de charge** (20 users, 1 min)
+5. Déploiement Production
+
+Voir **[load-tests/README.md](load-tests/README.md)** pour plus de détails.

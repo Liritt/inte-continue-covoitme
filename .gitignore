@@ -1,1 +1,7 @@
 /target/
+
+# Locust load test results
+load-tests/report*.html
+load-tests/results*.csv
+load-tests/__pycache__/
+report-*.html
