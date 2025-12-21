@@ -94,20 +94,22 @@ pipeline {
                 script {
                     echo "Running load tests on preprod environment"
 
-                    cd load-tests && \\
-                    docker run --rm \\
-                        -v \$(pwd):/mnt/locust \\
-                        -w /mnt/locust \\
-                        locustio/locust \\
-                        -f locustfile.py \\
-                        --host=http://10.11.19.50:8080 \\
-                        --headless \\
-                        --users=20 \\
-                        --spawn-rate=5 \\
-                        --run-time=1m \\
-                        --html=report-${BUILD_NUMBER}.html \\
-                        --csv=results-${BUILD_NUMBER} \\
-                        --only-summary
+                    sh """
+                        cd load-tests && \\
+                        docker run --rm \\
+                            -v \$(pwd):/mnt/locust \\
+                            -w /mnt/locust \\
+                            locustio/locust \\
+                            -f locustfile.py \\
+                            --host=http://10.11.19.50:8080 \\
+                            --headless \\
+                            --users=20 \\
+                            --spawn-rate=5 \\
+                            --run-time=1m \\
+                            --html=report-${BUILD_NUMBER}.html \\
+                            --csv=results-${BUILD_NUMBER} \\
+                            --only-summary
+                    """
                 }
             }
         }
