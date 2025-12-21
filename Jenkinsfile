@@ -59,6 +59,7 @@ pipeline {
                         sh "scp -o StrictHostKeyChecking=no compose.yml ${env.PREPROD_USER_HOST}:~/compose.yml"
                         sh "ssh -o StrictHostKeyChecking=no ${env.PREPROD_USER_HOST} 'mkdir -p ~/src/main/webapp/WEB-INF/sql'"
                         sh "scp -o StrictHostKeyChecking=no src/main/webapp/WEB-INF/sql/init.sql ${env.PREPROD_USER_HOST}:~/src/main/webapp/WEB-INF/sql/init.sql"
+                        sh "scp -r -o StrictHostKeyChecking=no load-tests ${env.PREPROD_USER_HOST}:~/load-tests"
 
                         def deployCmd = """
                             ssh -o StrictHostKeyChecking=no ${env.PREPROD_USER_HOST} '
@@ -88,7 +89,29 @@ pipeline {
             }
         }
 
-        // Si le tests réussissent sur la pre-prod, alors on peut déployer l'app sur la prod
+        stage('Load Tests') {
+            steps {
+                script {
+                    echo "Running load tests on preprod environment"
+
+                    cd load-tests && \\
+                    docker run --rm \\
+                        -v \$(pwd):/mnt/locust \\
+                        -w /mnt/locust \\
+                        locustio/locust \\
+                        -f locustfile.py \\
+                        --host=http://10.11.19.50:8080 \\
+                        --headless \\
+                        --users=20 \\
+                        --spawn-rate=5 \\
+                        --run-time=1m \\
+                        --html=report-${BUILD_NUMBER}.html \\
+                        --csv=results-${BUILD_NUMBER} \\
+                        --only-summary
+                }
+            }
+        }
+
         stage('Deploy to Prod') {
             steps {
                 sshagent(credentials: [env.PREPROD_SSH_ID]) {
