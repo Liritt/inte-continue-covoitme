@@ -91,42 +91,27 @@ pipeline {
 
         stage('Load Tests') {
             steps {
-                sshagent(credentials: [env.PREPROD_SSH_ID]) {
-                    script {
-                        echo "Running load tests on preprod environment with Docker..."
+                script {
+                    echo "Running load tests on preprod environment"
 
-                        def loadTestCmd = """
-                            ssh -o StrictHostKeyChecking=no ${env.PREPROD_USER_HOST} '
-                                cd ~/load-tests && \\
-                                docker run --rm \\
-                                    --network host \\
-                                    -v \$(pwd):/mnt/locust \\
-                                    -w /mnt/locust \\
-                                    locustio/locust \\
-                                    -f locustfile.py \\
-                                    --host=http://localhost:8080 \\
-                                    --headless \\
-                                    --users=20 \\
-                                    --spawn-rate=5 \\
-                                    --run-time=1m \\
-                                    --html=report-${BUILD_NUMBER}.html \\
-                                    --csv=results-${BUILD_NUMBER} \\
-                                    --only-summary
-                            '
-                        """
-                        sh loadTestCmd
-
-                        // Récupérer le rapport HTML
-                        sh "scp -o StrictHostKeyChecking=no ${env.PREPROD_USER_HOST}:~/load-tests/report-${BUILD_NUMBER}.html ."
-                        archiveArtifacts artifacts: "report-${BUILD_NUMBER}.html", fingerprint: true
-
-                        echo "Load tests completed. Report archived as artifact."
-                    }
+                    cd load-tests && \\
+                    docker run --rm \\
+                        -v \$(pwd):/mnt/locust \\
+                        -w /mnt/locust \\
+                        locustio/locust \\
+                        -f locustfile.py \\
+                        --host=http://10.11.19.50:8080 \\
+                        --headless \\
+                        --users=20 \\
+                        --spawn-rate=5 \\
+                        --run-time=1m \\
+                        --html=report-${BUILD_NUMBER}.html \\
+                        --csv=results-${BUILD_NUMBER} \\
+                        --only-summary
                 }
             }
         }
 
-        // Si le tests réussissent sur la pre-prod, alors on peut déployer l'app sur la prod
         stage('Deploy to Prod') {
             steps {
                 sshagent(credentials: [env.PREPROD_SSH_ID]) {
