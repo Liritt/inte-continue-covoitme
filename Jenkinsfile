@@ -98,6 +98,7 @@ pipeline {
                         cd load-tests && \\
                         docker run --rm \\
                             -v \$(pwd):/mnt/locust \\
+                            -v /home/urca/result:/mnt/locust/output \\
                             -w /mnt/locust \\
                             locustio/locust \\
                             -f locustfile.py \\
@@ -106,8 +107,8 @@ pipeline {
                             --users=20 \\
                             --spawn-rate=5 \\
                             --run-time=1m \\
-                            --html=report-${BUILD_NUMBER}.html \\
-                            --csv=results-${BUILD_NUMBER} \\
+                            --html=/mnt/locust/output/report-${BUILD_NUMBER}.html \\
+                            --csv=/mnt/locust/output/results-${BUILD_NUMBER} \\
                             --only-summary
                     """
                 }
